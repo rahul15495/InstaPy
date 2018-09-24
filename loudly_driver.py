@@ -7,6 +7,8 @@ from selenium.common.exceptions import NoSuchElementException
 from instapy import InstaPy
 
 from loudly_utils import utils as loudly_utils
+from instaCrawl.util.extractor import extract_information
+from instaCrawl.util.settings import Settings
 
 def get_influencer_following_handles(session,influencer):
     following_list= session.grab_following(username=influencer, amount="full", live_match=False, store_locally=False)
@@ -25,13 +27,22 @@ def main():
 
     session = InstaPy(username=insta_username,
                     password=insta_password,
-                    headless_browser=False,
+                    headless_browser=True,
                     multi_logs=True)
 
     try:
         session.login()
 
+        browser= session.browser
+
+        username= "_ishwari_"
+
         get_influencer_following_handles(session, "_ishwari_")
+
+        information, user_commented_list = extract_information(browser, username, Settings.limit_amount)
+
+        loudly_utils.dump(username, "data", {"information": information, "user_commented_list" : user_commented_list})
+
 
     except Exception as exc:
         # if changes to IG layout, upload the file to help us locate the change
