@@ -2,6 +2,8 @@ import os
 import time
 from tempfile import gettempdir
 
+import loudly_config
+
 from selenium.common.exceptions import NoSuchElementException
 
 from instapy import InstaPy
@@ -10,14 +12,19 @@ from loudly_utils import utils as loudly_utils
 from instaCrawl.util.extractor import extract_information
 from instaCrawl.util.settings import Settings
 
-def get_influencer_following_handles(session,influencer):
-    following_list= session.grab_following(username=influencer, amount="full", live_match=False, store_locally=False)
-    loudly_utils.dump(influencer, 'following', following_list)
+profile_queue = []
 
-def main():
-    insta_username = 'abhi_154'
-    insta_password = 'chaurasia15'
 
+def get_influencer_following_handles(session, influencer):
+    following_list = session.grab_following(
+        username=influencer, amount="full", live_match=False, store_locally=False)
+    # loudly_utils.dump(influencer, 'following', following_list)
+    return following_list
+
+
+def crwal(username, password, profile):
+
+    global profile_queue
     # set headless_browser=True if you want to run InstaPy on a server
 
     # set these in instapy/settings.py if you're locating the
@@ -25,29 +32,31 @@ def main():
     #   Settings.database_location = '/path/to/instapy.db'
     #   Settings.chromedriver_location = '/path/to/chromedriver'
 
-    session = InstaPy(username=insta_username,
-                    password=insta_password,
-                    headless_browser=True,
-                    multi_logs=True)
+    session = InstaPy(username=username,
+                      password=password,
+                      headless_browser=False,
+                      multi_logs=True)
 
     try:
         session.login()
 
-        browser= session.browser
+        browser = session.browser
 
-        username= "_ishwari_"
+        following_list = get_influencer_following_handles(session, profile)
 
-        get_influencer_following_handles(session, "_ishwari_")
+        profile_queue = profile_queue + following_list
 
-        information, user_commented_list = extract_information(browser, username, Settings.limit_amount)
+        loudly_utils.dump_visited(following_list, bulk=True)
 
-        loudly_utils.dump(username, "data", {"information": information, "user_commented_list" : user_commented_list})
+        # information, user_commented_list = extract_information(browser, profile, Settings.limit_amount)
 
+        # loudly_utils.dump(profile, "data", {"information": information, "user_commented_list" : user_commented_list})
 
     except Exception as exc:
         # if changes to IG layout, upload the file to help us locate the change
         if isinstance(exc, NoSuchElementException):
-            file_path = os.path.join(gettempdir(), '{}.html'.format(time.strftime('%Y%m%d-%H%M%S')))
+            file_path = os.path.join(gettempdir(), '{}.html'.format(
+                time.strftime('%Y%m%d-%H%M%S')))
             with open(file_path, 'wb') as fp:
                 fp.write(session.browser.page_source.encode('utf8'))
             print('{0}\nIf raising an issue, please also upload the file located at:\n{1}\n{0}'.format(
@@ -57,7 +66,18 @@ def main():
 
     finally:
         # end the bot session
+        loudly_utils.dump_visited(profile)
         session.end()
 
+
 if __name__ == '__main__':
-    main()
+    crwal(loudly_config.insta_username,
+          loudly_config.insta_password, loudly_config.seed)
+    while(len(profile_queue) > 0):
+        user = profile_queue.pop(0)
+
+        if not loudly_utils.hasVisited(user):
+            crwal(loudly_config.insta_username,
+                  loudly_config.insta_password, user)
+        else:
+            continue
