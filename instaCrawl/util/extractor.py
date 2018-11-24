@@ -227,11 +227,11 @@ def extract_information(browser, username, limit_amount):
 
     post_infos = []
     user_commented_total_list = []
-    if Settings.scrap_posts_infos is True and isprivate is False:
-        try:
-            post_infos, user_commented_total_list = extract_user_posts(browser, num_of_posts_to_do)
-        except:
-            InstaLogger.logger().error("Couldn't get user posts.")
+    # if Settings.scrap_posts_infos is True and isprivate is False:
+    #     try:
+    #         post_infos, user_commented_total_list = extract_user_posts(browser, num_of_posts_to_do)
+    #     except:
+    #         InstaLogger.logger().error("Couldn't get user posts.")
 
     information = {
         'alias': alias_name,
@@ -243,27 +243,27 @@ def extract_information(browser, username, limit_amount):
         'following': following,
         'bio_url': bio_url,
         'isprivate': isprivate,
-        'scrapped': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'posts': post_infos
+        'scrapped': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+  
     }
 
-    InstaLogger.logger().info( "User " +  username + " has " + str(len(user_commented_total_list)) + " comments.")
+    # InstaLogger.logger().info( "User " +  username + " has " + str(len(user_commented_total_list)) + " comments.")
 
-    # sorts the list by frequencies, so users who comment the most are at the top
-    import collections
-    from operator import itemgetter, attrgetter
-    counter = collections.Counter(user_commented_total_list)
-    com = sorted(counter.most_common(), key=itemgetter(1, 0), reverse=True)
-    com = map(lambda x: [x[0]] * x[1], com)
-    user_commented_total_list = [item for sublist in com for item in sublist]
+    # # sorts the list by frequencies, so users who comment the most are at the top
+    # import collections
+    # from operator import itemgetter, attrgetter
+    # counter = collections.Counter(user_commented_total_list)
+    # com = sorted(counter.most_common(), key=itemgetter(1, 0), reverse=True)
+    # com = map(lambda x: [x[0]] * x[1], com)
+    # user_commented_total_list = [item for sublist in com for item in sublist]
 
-    # remove duplicates preserving order (that's why not using set())
-    user_commented_list = []
-    last = ''
-    for i in range(len(user_commented_total_list)):
-        if username.lower() != user_commented_total_list[i]:
-            if last != user_commented_total_list[i]:
-                user_commented_list.append(user_commented_total_list[i])
-            last = user_commented_total_list[i]
+    # # remove duplicates preserving order (that's why not using set())
+    # user_commented_list = []
+    # last = ''
+    # for i in range(len(user_commented_total_list)):
+    #     if username.lower() != user_commented_total_list[i]:
+    #         if last != user_commented_total_list[i]:
+    #             user_commented_list.append(user_commented_total_list[i])
+    #         last = user_commented_total_list[i]
 
-    return information, user_commented_list
+    return information

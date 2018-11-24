@@ -5,21 +5,23 @@ import random
 
 path= "influencer_data"
 
-def dump(influencer,key, data):
+def dump_user(data):
 
     try:
         os.stat(path)
     except:
         os.mkdir(path)
     
-    with open("{}/{}.json".format(path,influencer),'wb') as f:
+    with open("{}/{}.json".format(path,'influencer_bio'),'rb') as f:
         
         try:
             df= json.load(f)
         except:
-            df= {}
+            df= []
         finally:
-            df[key]= data
+            df.append(data)
+
+    with open("{}/{}.json".format(path,'influencer_bio'),'wb') as f:
         
         json.dump(df,codecs.getwriter('utf-8')(f), ensure_ascii=False, default = lambda x: None)
 
@@ -33,7 +35,7 @@ def dump_visited(user, bulk=False):
         
         try:
             df= json.load(f)
-            print(df)
+            # print(df)
         except:
             df= {}
         finally:

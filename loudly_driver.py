@@ -12,6 +12,8 @@ from loudly_utils import utils as loudly_utils
 from instaCrawl.util.extractor import extract_information
 from instaCrawl.util.settings import Settings
 
+import traceback
+
 profile_queue = []
 
 
@@ -22,7 +24,7 @@ def get_influencer_following_handles(session, influencer):
     return following_list
 
 
-def crwal(username, password, profile):
+def crwal(session, profile):
 
     global profile_queue
     # set headless_browser=True if you want to run InstaPy on a server
@@ -32,25 +34,27 @@ def crwal(username, password, profile):
     #   Settings.database_location = '/path/to/instapy.db'
     #   Settings.chromedriver_location = '/path/to/chromedriver'
 
-    session = InstaPy(username=username,
-                      password=password,
-                      headless_browser=False,
-                      multi_logs=True)
+
 
     try:
-        session.login()
 
         browser = session.browser
 
-        following_list = get_influencer_following_handles(session, profile)
+        profile_data = extract_information(browser, profile, Settings.limit_amount)
 
-        profile_queue = profile_queue + following_list
+        if profile_data['followers'] > loudly_config.min_followers:
 
-        loudly_utils.dump_visited(following_list, bulk=True)
+            loudly_utils.dump_user(profile_data)
 
-        # information, user_commented_list = extract_information(browser, profile, Settings.limit_amount)
+            #following_list = get_influencer_following_handles(session, profile)
 
-        # loudly_utils.dump(profile, "data", {"information": information, "user_commented_list" : user_commented_list})
+            #profile_queue = profile_queue + following_list
+
+           # loudly_utils.dump_visited(following_list, bulk=True)
+        
+        else:
+            print('skipping {} as follower count is : {}'.format(profile,profile_data['followers']))
+        
 
     except Exception as exc:
         # if changes to IG layout, upload the file to help us locate the change
@@ -67,17 +71,37 @@ def crwal(username, password, profile):
     finally:
         # end the bot session
         loudly_utils.dump_visited(profile)
-        session.end()
+
+        return
+        
 
 
 if __name__ == '__main__':
-    crwal(loudly_config.insta_username,
-          loudly_config.insta_password, loudly_config.seed)
-    while(len(profile_queue) > 0):
-        user = profile_queue.pop(0)
 
-        if not loudly_utils.hasVisited(user):
-            crwal(loudly_config.insta_username,
-                  loudly_config.insta_password, user)
-        else:
-            continue
+    try:
+
+        session = InstaPy(username=loudly_config.insta_username,
+                        password=loudly_config.insta_password,
+                        headless_browser=True,
+                        multi_logs=True)
+
+        
+        session.login()
+
+        crwal(session,loudly_config.seed)
+
+        
+        while(1):
+            if len(profile_queue) > 0 :
+                user = profile_queue.pop(0)
+
+                if not loudly_utils.hasVisited(user):
+                    crwal(session, user)
+                else:
+                    continue
+            else:
+                crwal(session,loudly_config.getItem())
+    
+    except :
+        traceback.print_exc()
+        session.end()

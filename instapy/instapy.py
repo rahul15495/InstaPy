@@ -83,7 +83,7 @@ class InstaPy:
                  selenium_local_session=True,
                  use_firefox=False,
                  browser_profile_path=None,
-                 page_delay=25,
+                 page_delay=5,
                  show_logs=True,
                  headless_browser=False,
                  proxy_address=None,

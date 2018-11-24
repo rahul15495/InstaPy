@@ -180,7 +180,7 @@ def get_followers(browser,
                 if sc_rolled > 91:
                     print('\n')
                     logger.info("Queried too much! ~ sleeping a bit :>")
-                    sleep(600)
+                    sleep(10)
                     sc_rolled = 0
 
     except BaseException as exc:
@@ -205,8 +205,8 @@ def get_followers(browser,
         if grab=="full":
             relationship_data[username]["all_followers"] = all_followers
 
-    sleep_t = sc_rolled*6
-    sleep_t = sleep_t if sleep_t < 600 else random.randint(585, 655)
+    sleep_t = sc_rolled*2
+    sleep_t = sleep_t if sleep_t < 10 else random.randint(20, 25)
     sleep_n, sleep_s = ((sleep_t/60, "minutes") if sleep_t/60>=1 else 
                                 (sleep_t, "seconds"))
     sleep_n = float("{0:.4f}".format(sleep_n))
@@ -381,7 +381,7 @@ def get_following(browser,
                 if sc_rolled > 91:
                     print('\n')
                     logger.info("Queried too much! ~ sleeping a bit :>")
-                    sleep(600)
+                    sleep(10)
                     sc_rolled = 0
 
     except BaseException as exc:
@@ -407,8 +407,8 @@ def get_following(browser,
         if grab=="full":
             relationship_data[username]["all_following"] = all_following
 
-    sleep_t = sc_rolled*6
-    sleep_t = sleep_t if sleep_t < 600 else random.randint(585, 655)
+    sleep_t = sc_rolled*2
+    sleep_t = sleep_t if sleep_t < 10 else random.randint(20, 25)
     sleep_n, sleep_s = ((sleep_t/60, "minutes") if sleep_t/60>=1 else 
                                 (sleep_t, "seconds"))
     sleep_n = float("{0:.4f}".format(sleep_n))
