@@ -46,11 +46,11 @@ def crwal(session, profile):
 
             loudly_utils.dump_user(profile_data)
 
-            #following_list = get_influencer_following_handles(session, profile)
+            following_list = get_influencer_following_handles(session, profile)
 
-            #profile_queue = profile_queue + following_list
+            profile_queue = profile_queue + following_list
 
-           # loudly_utils.dump_visited(following_list, bulk=True)
+            loudly_utils.dump_visited(following_list, bulk=True)
         
         else:
             print('skipping {} as follower count is : {}'.format(profile,profile_data['followers']))
@@ -82,8 +82,26 @@ if __name__ == '__main__':
 
         session = InstaPy(username=loudly_config.insta_username,
                         password=loudly_config.insta_password,
-                        headless_browser=True,
+                        headless_browser=False,
                         multi_logs=True)
+
+
+        ############################### setting lat long ###############################
+        browser = session.browser
+
+        browser.execute_script("""window.navigator.geolocation.getCurrentPosition = 
+            function(success){
+                var position = {"coords" : {
+                                            "latitude": "13.068776734357694", 
+                                            "longitude": "9977.607421875000019"
+                                            }
+                                }; 
+                success(position);}""")
+
+
+        # Printing latitude, longitude from the browser
+
+        ##################################################################################
 
         
         session.login()
