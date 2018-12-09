@@ -83,7 +83,7 @@ if __name__ == '__main__':
         session = InstaPy(username=loudly_config.insta_username,
                         password=loudly_config.insta_password,
                         headless_browser=True,
-                        multi_logs=True,
+                        multi_logs=True, page_delay=100,
                         bypass_suspicious_attempt=True)
 
 
