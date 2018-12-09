@@ -22,6 +22,6 @@ insta_username = 'abhi_154'
 
 insta_password = 'chaurasia15'
 
-min_followers= 10
+min_followers= 10000
 
 seed= getItem()
